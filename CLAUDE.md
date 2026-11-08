@@ -36,3 +36,10 @@ npm run postman            # 重生 OpenAPI 並產生 Postman Collection（不�
 - ./docs/FEATURES.md — 功能列表與完成狀態
 - ./docs/TESTING.md — 測試規範與指南
 - ./docs/CHANGELOG.md — 更新日誌
+
+## 必要遵守項目
+- 不得修改 `tests/acceptance/**`（助教提供的驗收測試），只能修改實作讓測試通過
+- 金額一律以整數元計算，由後端依 DB 價格重算，不信任前端傳入的總額
+- SQL 一律使用 prepared statement 與 `?` 參數綁定，禁止字串拼接
+- 不手改產生檔：`openapi.json`（`npm run openapi`）、`public/css/output.css`（`npm run css:build`）、`postman_collection.json`
+- 功能完成後同步更新 `docs/FEATURES.md`、`docs/CHANGELOG.md`；詳細規範見 `.claude/rules/`
