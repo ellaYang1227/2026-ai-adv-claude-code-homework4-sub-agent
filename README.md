@@ -2,6 +2,22 @@
 
 Node.js + Express + SQLite + EJS + Tailwind CSS 全端電商專案，為第三場結束後的範例專案，另外加上第四場作業所需的素材。專案介紹與完整文件請見 [docs/README.md](./docs/README.md)。
 
+## [作業4] SubAgent 小隊、Issue 驅動開發與 Loop 自動化
+
+| 挑戰 | 說明 |
+|------|------|
+| 挑戰一：SubAgent 小隊與 AI Code Review | 定義 4 個 SubAgent：`security-reviewer`、`code-reviewer`（唯讀工具）、`test-runner`（sonnet、不得編輯）、`e2e-tester`（以 `skills` 預載 E2E Skill、以 `mcpServers` 掛上 Playwright MCP）。派出 SubAgent 審查訂單、付款、運費、購物車與測試，找出並修正 5 個埋藏問題（免運門檻、被跳過的測試、訂單越權查詢、購物車數量驗證、綠界驗簽），報告見 `docs/ai-review.md` |
+| 挑戰二：Issue 驅動開發（手動觸發） | 建立 `ready`／`in-progress`／`in-review`／`needs-human` 標籤，以 `permissions.deny` 鎖定驗收測試；用白話帶 AI 走完「讀 Issue → 實作 → 測試 → 開 PR → Review」完成 Issue #1 結帳優惠碼（PR #2），再將流程整理成 `/work-issue` Skill |
+| 挑戰三：Loop 自動觸發與 CI 回饋 | 撰寫 `.claude/loop.md`，以 `/loop` 每分鐘領取自己開的 `ready` Issue；Loop 自動執行 `/work-issue` 完成 Issue #3 我的訂單篩選與分頁（PR #4），讀取 GitHub Actions 結果並在 Issue 留下每輪回報 |
+
+儲存庫：[2026-ai-adv-claude-code-homework4-sub-agent](https://github.com/ellaYang1227/2026-ai-adv-claude-code-homework4-sub-agent)
+
+> 📋 Issue：[#1 結帳優惠碼](https://github.com/ellaYang1227/2026-ai-adv-claude-code-homework4-sub-agent/issues/1)（[PR #2](https://github.com/ellaYang1227/2026-ai-adv-claude-code-homework4-sub-agent/pull/2)）、[#3 我的訂單篩選與分頁](https://github.com/ellaYang1227/2026-ai-adv-claude-code-homework4-sub-agent/issues/3)（[PR #4](https://github.com/ellaYang1227/2026-ai-adv-claude-code-homework4-sub-agent/pull/4)）
+>
+> 🎬 Loop 自動處理 Issue 錄影：[YouTube](https://youtu.be/zLcYT6b8yY4)
+
+---
+
 ## 第四場作業前置準備
 
 ### 1. 用 Template 建立自己的儲存庫
