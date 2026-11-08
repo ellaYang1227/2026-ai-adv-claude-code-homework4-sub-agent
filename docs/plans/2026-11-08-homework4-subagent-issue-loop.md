@@ -286,7 +286,7 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 
 ### 挑戰三
 
-- [ ] 建立 `.claude/loop.md`（依 3.1 格式）
+- [x] 建立 `.claude/loop.md`（依 3.1 格式）
 - [ ] commit 並推上 `main`
 - [ ] 執行 `/loop`（間隔 1 分鐘），開始錄影
 - [ ] 在 GitHub 網頁建立 Issue B 並加上 `ready`
