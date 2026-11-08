@@ -252,13 +252,13 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 
 ### 挑戰一
 
-- [ ] 建立 `security-reviewer`（tools：Read、Grep、Glob）
-- [ ] 建立 `code-reviewer`（tools：Read、Grep、Glob；含測試刪除／跳過／放寬檢查）
-- [ ] 建立 `test-runner`（model：sonnet 或 haiku；不得有 Edit、Write；只回報失敗項目、位置與可能原因）
-- [ ] 複製第二場 `e2e-payment-test` Skill 到 `.claude/skills/`，改成本專案的網址、帳號與結帳流程
-- [ ] 建立 `e2e-tester`（`skills` 預載 `e2e-payment-test`、`mcpServers` 掛 Playwright MCP）
+- [x] 建立 `security-reviewer`（tools：Read、Grep、Glob）
+- [x] 建立 `code-reviewer`（tools：Read、Grep、Glob；含測試刪除／跳過／放寬檢查）
+- [x] 建立 `test-runner`（model：sonnet 或 haiku；不得有 Edit、Write；只回報失敗項目、位置與可能原因）
+- [x] 複製第二場 `e2e-payment-test` Skill 到 `.claude/skills/`，改成本專案的網址、帳號與結帳流程
+- [x] 建立 `e2e-tester`（`skills` 預載 `e2e-payment-test`、`mcpServers` 掛 Playwright MCP）
 - [ ] 啟動 3001 服務，派 `e2e-tester` 實跑一次，確認能完成付款並截圖
-- [ ] 確認四個 agent 的 `description` 寫清楚派出時機、內文有固定輸出格式
+- [x] 確認四個 agent 的 `description` 寫清楚派出時機、內文有固定輸出格式
 - [ ] commit 並推上 `main`
 - [ ] 派 `security-reviewer`、`code-reviewer` 審查，派 `test-runner` 跑 unit 與 integration
 - [ ] 整理 `docs/ai-review.md`（至少 3 個問題，每個附位置與說明），此步不改程式碼
