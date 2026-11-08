@@ -34,6 +34,7 @@
 │   │   └── errorHandler.js         # 全域錯誤處理：依狀態碼對應錯誤碼與安全訊息，500 一律回「伺服器內部錯誤」
 │   ├── utils/
 │   │   ├── coupon.js               # 結帳優惠碼純邏輯：優惠碼定義、門檻、折扣計算（四捨五入、上限）
+│   │   ├── orderListQuery.js       # 會員訂單列表查詢參數驗證（status、page、limit）與 pagination 組裝
 │   │   ├── ecpay.js                # 綠界 ECPay 工具：CheckMacValue 簽章、URL 編碼、AIO 表單產生、QueryTradeInfo 查詢
 │   │   ├── shipping.js             # 配送費用純邏輯：基本運費、免運門檻、偏遠/急件附加費
 │   │   └── validators.js           # 共用輸入驗證：非空字串、選填字串、正整數
@@ -181,7 +182,7 @@ server.js
 | 方法 | 路徑 | 認證 | 說明 | 檔案 |
 |------|------|------|------|------|
 | POST | `/api/orders` | JWT | 從購物車建立訂單（伺服器重算運費與總額） | orderRoutes.js |
-| GET | `/api/orders` | JWT | 自己的訂單列表 | orderRoutes.js |
+| GET | `/api/orders` | JWT | 自己的訂單列表（`status`、`page`、`limit`，含 `pagination`） | orderRoutes.js |
 | GET | `/api/orders/:id` | JWT | 訂單詳情 | orderRoutes.js |
 | PATCH | `/api/orders/:id/pay` | JWT | 模擬付款（僅 `NODE_ENV=test`，其他環境 404） | orderRoutes.js |
 | POST | `/api/orders/:id/check-payment` | JWT | 查詢綠界付款狀態 | orderRoutes.js |

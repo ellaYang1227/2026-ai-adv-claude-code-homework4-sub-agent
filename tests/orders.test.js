@@ -105,6 +105,48 @@ describe('Orders API', () => {
     expect(res.body.data).toHaveProperty('orders');
     expect(Array.isArray(res.body.data.orders)).toBe(true);
     expect(res.body.data.orders.length).toBeGreaterThan(0);
+    expect(res.body.data.pagination).toEqual({
+      page: 1,
+      limit: 10,
+      total: res.body.data.orders.length,
+      totalPages: 1
+    });
+  });
+
+  it('should filter order list by status', async () => {
+    const pending = await request(app)
+      .get('/api/orders?status=pending')
+      .set('Authorization', `Bearer ${userToken}`);
+    expect(pending.status).toBe(200);
+    expect(pending.body.data.orders.length).toBeGreaterThan(0);
+    expect(pending.body.data.orders.every(order => order.status === 'pending')).toBe(true);
+
+    const paid = await request(app)
+      .get('/api/orders?status=paid')
+      .set('Authorization', `Bearer ${userToken}`);
+    expect(paid.status).toBe(200);
+    expect(paid.body.data.orders).toEqual([]);
+    expect(paid.body.data.pagination).toEqual({ page: 1, limit: 10, total: 0, totalPages: 0 });
+  });
+
+  it.each([
+    '?status=unknown',
+    '?status=',
+    '?page=0',
+    '?page=1.5',
+    '?page=2abc',
+    '?limit=-1',
+    '?limit=0',
+    '?page=1&page=2'
+  ])('should reject invalid order list query %s', async (query) => {
+    const res = await request(app)
+      .get(`/api/orders${query}`)
+      .set('Authorization', `Bearer ${userToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('data', null);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+    expect(typeof res.body.message).toBe('string');
   });
 
   it('should get order detail', async () => {
