@@ -5,12 +5,15 @@
 ## [Unreleased]
 
 ### Added
+- 我的訂單篩選與分頁（Issue #3）：`GET /api/orders` 支援 `status`（pending／paid／failed）、`page`（預設 1）、`limit`（預設 10、上限 50），回應新增 `pagination: { page, limit, total, totalPages }`；不合法的參數回 400 `VALIDATION_ERROR`。新增 `src/utils/orderListQuery.js` 與 `tests/orderListQuery.test.js`
+- 「我的訂單」頁新增頁碼按鈕，配合分頁後的列表 API
 - 結帳優惠碼（Issue #1）：新增 `src/utils/coupon.js`，支援 `FLOWER100`（滿 800 折 100）、`SPRING10`（9 折、最多折 300）；`SUMMER50` 已失效。`POST /api/orders` 新增選填 `couponCode`，回應與 `GET /api/orders/:id` 新增 `discount`、`coupon_code`
 - `orders` 表新增 `coupon_code`、`discount` 欄位（可重複執行的 migration，舊訂單 `discount = 0`）
 - 優惠碼無效、失效或未達門檻時回 400（`INVALID_COUPON`、`COUPON_EXPIRED`、`COUPON_NOT_APPLICABLE`），不建立訂單、不扣庫存、不清空購物車
 - 新增 `tests/coupon.test.js` 與 2 項優惠碼 Integration Test（DB 快照、綠界 `TotalAmount`、無效優惠碼不動資料）
 
 ### Changed
+- `GET /api/orders` 改為分頁回應（預設每頁 10 筆），列表欄位新增 `discount`、`coupon_code`；排序加上 `rowid DESC` 次排序，同一秒建立的訂單順序固定
 - 免運門檻改以折扣後的商品小計判斷；訂單總額 = 商品小計 − 折扣 + 運費
 
 ### Fixed

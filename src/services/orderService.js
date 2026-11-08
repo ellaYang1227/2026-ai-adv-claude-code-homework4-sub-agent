@@ -26,12 +26,25 @@ function findOrderForUser(orderId, userId) {
   return db.prepare('SELECT * FROM orders WHERE id = ? AND user_id = ?').get(orderId, userId);
 }
 
-function listOrdersForUser(userId) {
-  return db.prepare(
-    `SELECT id, order_no, subtotal, shipping_fee, shipping_method,
+/**
+ * List one member's orders, newest first, with an optional status filter.
+ * `created_at` only has one-second precision, so rowid breaks ties to keep
+ * the order (and therefore pagination) stable.
+ */
+function listOrdersForUser(userId, { status = null, page = 1, limit = 10 } = {}) {
+  const where = status ? 'WHERE user_id = ? AND status = ?' : 'WHERE user_id = ?';
+  const params = status ? [userId, status] : [userId];
+
+  const { total } = db.prepare(`SELECT COUNT(*) AS total FROM orders ${where}`).get(...params);
+  const orders = db.prepare(
+    `SELECT id, order_no, subtotal, discount, coupon_code, shipping_fee, shipping_method,
             is_remote_area, is_express, total_amount, status, created_at
-     FROM orders WHERE user_id = ? ORDER BY created_at DESC`
-  ).all(userId);
+     FROM orders ${where}
+     ORDER BY created_at DESC, rowid DESC
+     LIMIT ? OFFSET ?`
+  ).all(...params, limit, (page - 1) * limit);
+
+  return { orders, total };
 }
 
 function getOrderItems(orderId) {

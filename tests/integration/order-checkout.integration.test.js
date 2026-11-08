@@ -378,6 +378,49 @@ describe('Order checkout integration flow', () => {
     ).get(member.user.id, primaryProduct.id).quantity).toBe(2);
   });
 
+  it('lists only the member\'s own orders, newest first, with stable paging inside the same second', async () => {
+    const member = await registerMember('order-list@example.com');
+    const other = await registerMember('order-list-other@example.com');
+
+    const insertOrder = db.prepare(
+      `INSERT INTO orders (
+         id, order_no, user_id, recipient_name, recipient_email, recipient_address,
+         subtotal, shipping_fee, total_amount, status, created_at
+       ) VALUES (?, ?, ?, '收件人', 'r@example.com', '地址', 100, 60, 160, ?, ?)`
+    );
+    // Five orders share the same created_at second; rowid must keep the order stable
+    const sameSecond = '2026-11-08 08:00:00';
+    for (let i = 1; i <= 5; i++) {
+      insertOrder.run(`mine-${i}`, `ORD-TEST-${i}`, member.user.id, i === 3 ? 'paid' : 'pending', sameSecond);
+    }
+    insertOrder.run('mine-newest', 'ORD-TEST-NEW', member.user.id, 'pending', '2026-11-08 09:00:00');
+    insertOrder.run('other-1', 'ORD-TEST-OTHER', other.user.id, 'paid', '2026-11-08 10:00:00');
+
+    const list = async (query) => {
+      const response = await request(app)
+        .get(`/api/orders${query}`)
+        .set('Authorization', `Bearer ${member.token}`);
+      expectEnvelope(response, 200);
+      expect(response.body.error).toBeNull();
+      return response.body.data;
+    };
+
+    const page1 = await list('?limit=4');
+    const page2 = await list('?limit=4&page=2');
+    expect(page1.orders.map(order => order.id)).toEqual(['mine-newest', 'mine-5', 'mine-4', 'mine-3']);
+    expect(page2.orders.map(order => order.id)).toEqual(['mine-2', 'mine-1']);
+    expect(page1.pagination).toEqual({ page: 1, limit: 4, total: 6, totalPages: 2 });
+    expect(page2.pagination).toEqual({ page: 2, limit: 4, total: 6, totalPages: 2 });
+
+    const paid = await list('?status=paid');
+    expect(paid.orders.map(order => order.id)).toEqual(['mine-3']);
+    expect(paid.pagination.total).toBe(1);
+
+    const beyond = await list('?page=5&limit=4');
+    expect(beyond.orders).toEqual([]);
+    expect(beyond.pagination).toEqual({ page: 5, limit: 4, total: 6, totalPages: 2 });
+  });
+
   it('builds a valid ECPay staging form with the persisted order total', async () => {
     const { order } = await createPendingOrder(primaryProduct, 'ecpay-form@example.com');
     const response = await request(app).get(`/ecpay/payment/${order.id}`);

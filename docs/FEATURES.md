@@ -9,13 +9,13 @@
 | 購物車管理 | ✅ 完成 | 雙模式認證（JWT / Session ID），登入時合併訪客購物車 |
 | 配送費用 | ✅ 完成 | 宅配/超商、滿額免基本運費、偏遠/急件附加費 |
 | 結帳優惠碼 | ✅ 完成 | `FLOWER100`、`SPRING10`；折抵商品小計，免運門檻以折扣後小計判斷 |
-| 訂單管理 | ✅ 完成 | 建立、查詢、模擬付款（僅測試環境） |
+| 訂單管理 | ✅ 完成 | 建立、查詢（狀態篩選與分頁）、模擬付款（僅測試環境） |
 | 綠界金流串接 | ✅ 完成 | ECPay AIO 付款、QueryTradeInfo 查詢驗證 |
 | 後台商品管理 | ✅ 完成 | 商品 CRUD |
 | 後台訂單管理 | ✅ 完成 | 訂單查詢與狀態篩選 |
 | 前台頁面 | ✅ 完成 | EJS + Tailwind CSS |
 | 後台頁面 | ✅ 完成 | EJS + Tailwind CSS |
-| 測試 | ✅ 完成 | 91 項 Unit/API + 12 項 Integration + 1 項綠界真實付款 E2E |
+| 測試 | ✅ 完成 | 126 項 Unit/API + 13 項 Integration + 1 項綠界真實付款 E2E |
 | API 文件 | ✅ 完成 | Swagger/OpenAPI 生成與 Postman Collection 自動轉換 |
 
 ---
@@ -313,9 +313,43 @@
 
 ### GET /api/orders — 訂單列表
 
-**行為描述**：回傳當前使用者的所有訂單，依建立時間降序排列。無分頁。
+**行為描述**：回傳當前使用者的訂單，可依狀態篩選並分頁。只回傳本人的訂單，依建立時間由新到舊排序；同一秒建立的訂單以寫入順序（`rowid`）由新到舊，確保分頁穩定。
 
-**回應欄位**：id, order_no, subtotal, shipping_fee, shipping_method, is_remote_area, is_express, total_amount, status, created_at
+**查詢參數**：
+
+| 參數 | 型別 | 預設 | 規則 |
+|------|------|------|------|
+| status | string | 不篩選 | `pending`、`paid`、`failed` 其中之一 |
+| page | integer | 1 | 正整數 |
+| limit | integer | 10 | 正整數；超過 50 以 50 計 |
+
+參數驗證由 `src/utils/orderListQuery.js` 的 `parseOrderListQuery()` 處理：未帶參數時用預設值；有帶但不合法（`0`、負數、小數、`"2abc"`、空字串、重複參數如 `?page=1&page=2`）一律回 400。
+
+**回應格式**（與 `GET /api/admin/orders` 相同）：
+
+```json
+{
+  "data": {
+    "orders": [ { "id": "...", "order_no": "...", "subtotal": 800, "discount": 100, "coupon_code": "FLOWER100", "shipping_fee": 120, "total_amount": 820, "status": "pending", "created_at": "..." } ],
+    "pagination": { "page": 1, "limit": 10, "total": 12, "totalPages": 2 }
+  },
+  "error": null,
+  "message": "成功"
+}
+```
+
+**回應欄位**：id, order_no, subtotal, discount, coupon_code, shipping_fee, shipping_method, is_remote_area, is_express, total_amount, status, created_at
+
+- `totalPages = ceil(total / limit)`；沒有訂單時為 0
+- `page` 超過 `totalPages` 時回 200 與空陣列
+
+**錯誤情境**：
+
+| 狀態碼 | 錯誤碼 | 情境 |
+|--------|--------|------|
+| 400 | VALIDATION_ERROR | `status` 不在允許值內，或 `page`、`limit` 不是正整數 |
+
+**前端**：「我的訂單」頁（`public/js/pages/orders.js`）依 `pagination` 顯示頁碼按鈕，每頁 10 筆。狀態篩選 UI 不在本次範圍。
 
 ### GET /api/orders/:id — 訂單詳情
 
