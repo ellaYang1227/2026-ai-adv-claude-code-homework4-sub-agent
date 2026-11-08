@@ -432,6 +432,15 @@ describe('Order checkout integration flow', () => {
         MerchantTradeNo: merchantTradeNo,
         TradeAmt: '1',
         TradeStatus: '1'
+      }),
+      // Paid response without any CheckMacValue
+      `MerchantID=${ECPAY_CONFIG.merchantId}&MerchantTradeNo=${merchantTradeNo}&TradeAmt=${order.total_amount}&TradeStatus=1`,
+      // Valid signature but another order's MerchantTradeNo
+      signedTradeInfo({
+        MerchantID: ECPAY_CONFIG.merchantId,
+        MerchantTradeNo: 'ORD20260101OTHER',
+        TradeAmt: String(order.total_amount),
+        TradeStatus: '1'
       })
     ];
 

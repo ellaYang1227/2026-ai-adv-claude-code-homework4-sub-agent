@@ -1,4 +1,5 @@
 const { app, request, getAdminToken, registerUser } = require('./setup');
+const db = require('../src/database');
 
 describe('Cart API', () => {
   const sessionId = 'test-session-' + Date.now();
@@ -53,6 +54,41 @@ describe('Cart API', () => {
     expect(res.body).toHaveProperty('data');
     expect(res.body).toHaveProperty('error', null);
     expect(res.body.data).toHaveProperty('quantity', 3);
+  });
+
+  it.each([
+    ['zero', 0],
+    ['negative', -1],
+    ['decimal', 1.5],
+    ['non-integer string', '3abc'],
+    ['empty string', ''],
+    ['null', null],
+    ['boolean', true],
+    ['array', [5]]
+  ])('should reject %s quantity on update (guest mode)', async (_label, quantity) => {
+    const res = await request(app)
+      .patch(`/api/cart/${cartItemId}`)
+      .set('X-Session-Id', sessionId)
+      .send({ quantity });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('data', null);
+    expect(res.body).toHaveProperty('error', 'VALIDATION_ERROR');
+    expect(db.prepare('SELECT quantity FROM cart_items WHERE id = ?').get(cartItemId).quantity).toBe(3);
+  });
+
+  it('should reject update quantity above stock (guest mode)', async () => {
+    const { stock } = db.prepare('SELECT stock FROM products WHERE id = ?').get(productId);
+
+    const res = await request(app)
+      .patch(`/api/cart/${cartItemId}`)
+      .set('X-Session-Id', sessionId)
+      .send({ quantity: stock + 1 });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('data', null);
+    expect(res.body).toHaveProperty('error', 'STOCK_INSUFFICIENT');
+    expect(db.prepare('SELECT quantity FROM cart_items WHERE id = ?').get(cartItemId).quantity).toBe(3);
   });
 
   it('should remove cart item (guest mode)', async () => {

@@ -248,7 +248,7 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 
 - [x] 安裝 GitHub CLI 並 `gh auth login`，確認 `gh repo view` 可用（Windows 版 `gh.exe`）
 - [x] 讓 WSL 可用 `gh` 指令（`/usr/local/bin/gh` → `gh.exe`）
-- [ ] 確認 `main` 與 `origin/main` 同步
+- [x] 確認 `main` 與 `origin/main` 同步
 
 ### 挑戰一
 
@@ -259,10 +259,10 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 - [x] 建立 `e2e-tester`（`skills` 預載 `e2e-payment-test`、`mcpServers` 掛 Playwright MCP）
 - [ ] 啟動 3001 服務，派 `e2e-tester` 實跑一次，確認能完成付款並截圖
 - [x] 確認四個 agent 的 `description` 寫清楚派出時機、內文有固定輸出格式
-- [ ] commit 並推上 `main`
-- [ ] 派 `security-reviewer`、`code-reviewer` 審查，派 `test-runner` 跑 unit 與 integration
-- [ ] 整理 `docs/ai-review.md`（至少 3 個問題，每個附位置與說明），此步不改程式碼
-- [ ] 修正問題，跑過 `test:unit`、`test:integration`
+- [x] commit 並推上 `main`
+- [x] 派 `security-reviewer`、`code-reviewer` 審查，派 `test-runner` 跑 unit 與 integration
+- [x] 整理 `docs/ai-review.md`（至少 3 個問題，每個附位置與說明），此步不改程式碼
+- [x] 修正問題，跑過 `test:unit`、`test:integration`
 - [ ] 連同 `docs/ai-review.md` commit 並推上 `main`
 
 ### 挑戰二
