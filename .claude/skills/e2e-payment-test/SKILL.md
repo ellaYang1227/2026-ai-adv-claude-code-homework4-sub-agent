@@ -86,6 +86,7 @@ description: 用 Playwright MCP 對花漾生活花卉電商（http://localhost:3
 
 - 本專案的 node 是 Windows 版，服務只聽在 Windows 的 localhost：WSL 的 `curl` 連不到，要用 `curl.exe` 確認服務
 - WSL 的 `sqlite3` 無法讀取執行中的 `database.sqlite`（WAL），驗證訂單狀態請改用 API
+- Playwright MCP 必須用 `cmd.exe /c npx ...` 啟動：WSL 的 `npx`（`/mnt/c/nvm4w/nodejs/npx` 包裝腳本）無法把 stdio 接到 Windows 版 node，MCP 不回應 `initialize`，Claude Code 會在 30 秒後 `CONNECT_TIMEOUT`，subagent 就沒有 `browser_*` 工具
 
 ## 錄影
 

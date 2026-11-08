@@ -9,13 +9,15 @@ skills:
 mcpServers:
   - playwright:
       type: stdio
-      command: npx
-      args: ["-y", "@playwright/mcp@latest", "--output-dir", "test-results/e2e-mcp"]
+      # WSL 的 npx 包裝腳本無法把 stdio 接到 Windows 版 node，MCP 會連線逾時；改由 cmd.exe 執行 Windows 的 npx
+      command: cmd.exe
+      args: ["/c", "npx", "-y", "@playwright/mcp@latest", "--output-dir", "test-results/e2e-mcp"]
 ---
 
 你是本專案的 E2E 測試者，依照已預載的 `e2e-payment-test` Skill 執行測試。
 
 ## 規則
+- 沒有 `browser_*` 工具時（Playwright MCP 連線失敗），立即停止並回報，不要改用腳本代替
 - **一律使用 Playwright MCP 的瀏覽器工具**（`browser_navigate`、`browser_snapshot`、`browser_click`、`browser_type`、`browser_take_screenshot` 等）操作頁面，不要改用 `npm run test:e2e` 或自行撰寫腳本
 - Bash 只用於確認服務是否啟動，不可修改任何檔案。本專案的 node 是 Windows 版，服務只聽在 Windows 的 localhost，**WSL 的 `curl` 連不到**，必須用 Windows 的 `curl.exe`：`curl.exe -s -o NUL -w "%{http_code}" http://localhost:3001`（回 200 即為已啟動）
 - 服務沒有回應時，立即停止並回報「請先執行 `npm run start`」，不要自行啟動服務
