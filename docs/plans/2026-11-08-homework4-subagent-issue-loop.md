@@ -263,11 +263,11 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 - [x] 派 `security-reviewer`、`code-reviewer` 審查，派 `test-runner` 跑 unit 與 integration
 - [x] 整理 `docs/ai-review.md`（至少 3 個問題，每個附位置與說明），此步不改程式碼
 - [x] 修正問題，跑過 `test:unit`、`test:integration`
-- [ ] 連同 `docs/ai-review.md` commit 並推上 `main`
+- [x] 連同 `docs/ai-review.md` commit 並推上 `main`
 
 ### 挑戰二
 
-- [ ] 用 `gh label create` 建立 `ready`、`in-progress`、`in-review`、`needs-human`
+- [x] 用 `gh label create` 建立 `ready`、`in-progress`、`in-review`、`needs-human`
 - [ ] 在 GitHub 網頁建立 Issue A 並加上 `ready`
 - [ ] `.claude/settings.json` 的 `permissions.deny` 加入 `"Edit(./tests/acceptance/**)"`，commit 並推上 `main`
 - [ ] Issue A：標籤改為 `in-progress`
