@@ -287,17 +287,17 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 ### 挑戰三
 
 - [x] 建立 `.claude/loop.md`（依 3.1 格式）
-- [ ] commit 並推上 `main`
-- [ ] 執行 `/loop`（間隔 1 分鐘），開始錄影
-- [ ] 在 GitHub 網頁建立 Issue B 並加上 `ready`
-- [ ] Loop 自動處理 Issue B：實作 `GET /api/orders` 篩選與分頁、補測試、跑 `test:acceptance -- order-filter`、更新文件、開 PR
-- [ ] 確認前端訂單頁仍正常顯示
-- [ ] CI 失敗時 Loop 自動修正；通過後由本人合併
-- [ ] 確認兩個 Issue 皆關閉、每輪都有回報留言
-- [ ] 截下排程任務清單，取消排程
+- [x] commit 並推上 `main`
+- [x] 執行 `/loop`（間隔 1 分鐘），開始錄影
+- [x] 在 GitHub 網頁建立 Issue B 並加上 `ready`（Issue #3）
+- [x] Loop 自動處理 Issue B：實作 `GET /api/orders` 篩選與分頁、補測試、跑 `test:acceptance -- order-filter`、更新文件、開 PR
+- [x] 確認前端訂單頁仍正常顯示（e2e-tester 驗證：11 筆分 2 頁、換頁正常、僅 2 筆時不顯示頁碼、無 JS 錯誤）
+- [x] CI 失敗時 Loop 自動修正；通過後由本人合併（PR #4 CI 一次通過，未觸發修正）
+- [x] 確認兩個 Issue 皆關閉、每輪都有回報留言（Issue #1、#3 皆 CLOSED；#3 有 Loop 回報）
+- [x] 截下排程任務清單，取消排程（job 9a4f9953 已刪除）
 
 ### 收尾
 
-- [ ] `npm run test:unit`、`npm run test:integration`、`npm run test:acceptance -- coupon`、`npm run test:acceptance -- order-filter` 全數通過
-- [ ] 更新 `docs/FEATURES.md`、`docs/CHANGELOG.md`
-- [ ] 本計畫移至 `docs/plans/archive/`
+- [x] `npm run test:unit`、`npm run test:integration`、`npm run test:acceptance -- coupon`、`npm run test:acceptance -- order-filter` 全數通過（126／13／10／7）
+- [x] 更新 `docs/FEATURES.md`、`docs/CHANGELOG.md`
+- [x] 本計畫移至 `docs/plans/archive/`
