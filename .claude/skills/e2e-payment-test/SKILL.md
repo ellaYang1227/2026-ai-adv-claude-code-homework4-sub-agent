@@ -74,6 +74,15 @@ description: 用 Playwright MCP 對花漾生活花卉電商（http://localhost:3
 | `paid` | 已付款 |
 | `failed` | 付款失敗 |
 
+## 截圖存放位置
+
+`e2e-tester` 的 Playwright MCP 以 `--output-dir test-results/e2e-mcp` 啟動，截圖存到專案的 `test-results/e2e-mcp/`（已列入 `.gitignore`）。未指定時會存到 MCP 的暫存目錄，agent 結束後找不到。
+
+## 環境注意事項（WSL + Windows node）
+
+- 本專案的 node 是 Windows 版，服務只聽在 Windows 的 localhost：WSL 的 `curl` 連不到，要用 `curl.exe` 確認服務
+- WSL 的 `sqlite3` 無法讀取執行中的 `database.sqlite`（WAL），驗證訂單狀態請改用 API
+
 ## 錄影
 
 Playwright MCP 不支援自動錄影。需要影片時，先用 Windows「剪取工具」（`Win + Shift + S` → 錄製）選取瀏覽器視窗開始錄製，再呼叫本 Skill。
