@@ -4,6 +4,14 @@
 
 ## 本輪開始前
 
+**先確認上一輪是否還在進行。** Loop 每分鐘觸發一次，但 `/work-issue` 會派 SubAgent 在背景執行，一個 Issue 通常會跨好幾輪。以下任一成立，就代表上一輪仍在處理中：
+- 本對話中上一輪執行的 `/work-issue` 或 CI 修正還沒走到結束（例如還在等 `test-runner`、`code-reviewer`、`security-reviewer` 回報，或還沒把標籤改成 `in-review`）
+- 本對話中有任何還在執行的背景 SubAgent
+
+仍在處理中：**本輪不做事、不留言、不改標籤、不檢查工作目錄**，直接結束，讓上一輪繼續完成。
+
+確認上一輪已結束後，才執行：
+
 ```bash
 gh issue list --author @me --state open --json number,title,labels,createdAt
 git status --short
@@ -14,9 +22,10 @@ git status --short
 
 ## 判斷順序
 
-1. **有 `in-progress`**：上一輪沒有正常結束
-   - 在該 Issue 留言說明（最後停在哪一步、分支與 PR 狀態）
-   - 標籤改為 `needs-human`：`gh issue edit <編號> --remove-label in-progress --add-label needs-human`
+1. **有 `in-progress`**（而且上面已確認本對話中沒有正在處理它）：可能是上一輪異常中斷，或是在另一個 session 處理到一半
+   - 查出標籤改成 `in-progress` 的時間：`gh api repos/{owner}/{repo}/issues/<編號>/events --jq '[.[] | select(.event=="labeled" and .label.name=="in-progress")] | last | .created_at'`
+   - **未滿 60 分鐘**：可能還有其他 session 在處理，本輪不做事、不留言
+   - **已滿 60 分鐘**：視為中斷。在該 Issue 留言說明（最後停在哪一步、分支與 PR 狀態），標籤改為 `needs-human`：`gh issue edit <編號> --remove-label in-progress --add-label needs-human`
 
 2. **有 `in-review`**：找出對應的 PR，用 `gh pr checks` 查 CI
    - 找 PR：`gh pr list --state open --json number,headRefName` 中 `headRefName` 以 `issue-<編號>-` 開頭的那一個
