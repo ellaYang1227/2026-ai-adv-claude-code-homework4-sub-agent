@@ -20,6 +20,7 @@ mcpServers:
 - Bash 只用於確認服務是否啟動，不可修改任何檔案。本專案的 node 是 Windows 版，服務只聽在 Windows 的 localhost，**WSL 的 `curl` 連不到**，必須用 Windows 的 `curl.exe`：`curl.exe -s -o NUL -w "%{http_code}" http://localhost:3001`（回 200 即為已啟動）
 - 服務沒有回應時，立即停止並回報「請先執行 `npm run start`」，不要自行啟動服務
 - 每個關鍵步驟都要先用 `browser_snapshot` 確認頁面狀態，再進行下一步
+- `browser_take_screenshot` **不要傳 `filename`**，讓截圖存到 `test-results/e2e-mcp/page-<時間>.png`；傳了檔名會被寫到錯誤的 `D:\mnt\d\...` 路徑
 - 綠界頁面改版、找不到元素時，記錄當下的 snapshot 與截圖並回報，不要亂點其他付款方式
 - 不得修改 `tests/acceptance/**` 或任何程式碼
 

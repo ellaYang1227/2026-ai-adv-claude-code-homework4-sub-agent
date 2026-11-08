@@ -257,7 +257,7 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 - [x] 建立 `test-runner`（model：sonnet 或 haiku；不得有 Edit、Write；只回報失敗項目、位置與可能原因）
 - [x] 複製第二場 `e2e-payment-test` Skill 到 `.claude/skills/`，改成本專案的網址、帳號與結帳流程
 - [x] 建立 `e2e-tester`（`skills` 預載 `e2e-payment-test`、`mcpServers` 掛 Playwright MCP）
-- [x] 啟動 3001 服務，派 `e2e-tester` 實跑一次，確認能完成付款並截圖（2026-11-08：兩個場景通過，訂單 ORD-20261108-ACAEF 已付款；截圖未保留，已加 `--output-dir` 待重跑）
+- [x] 啟動 3001 服務，派 `e2e-tester` 實跑一次，確認能完成付款並截圖（2026-11-08：兩次實跑皆通過；第二次訂單 ORD-20261108-29250 已付款，截圖存於 `test-results/e2e-mcp/`）
 - [x] 確認四個 agent 的 `description` 寫清楚派出時機、內文有固定輸出格式
 - [x] commit 並推上 `main`
 - [x] 派 `security-reviewer`、`code-reviewer` 審查，派 `test-runner` 跑 unit 與 integration

@@ -45,9 +45,9 @@ description: 用 Playwright MCP 對花漾生活花卉電商（http://localhost:3
    - 出現站內提示視窗時，點「關閉」或「確定」
    - 可能開新分頁（土地銀行測試頁），用 `browser_tabs` 切換過去
 10. **銀行測試頁**：點「Save」
-11. **確認付款成功**：等待頁面出現「付款成功」或「交易成功」，用 `browser_take_screenshot` 截圖，檔名 `ecpay-payment-success.png`
+11. **確認付款成功**：等待頁面出現「付款成功」或「交易成功」，用 `browser_take_screenshot` 截圖（**不要傳 `filename`**，見「截圖存放位置」），記下回傳的檔名，對應「綠界付款成功」
 12. **返回商店**：點「返回商店」，回到訂單詳情頁 `/orders/<訂單ID>?payment=pending`。頁面載入時會自動向綠界查詢一次付款狀態
-13. **確認訂單狀態**：頁面顯示「已付款」與「付款成功！感謝您的購買。」，截圖 `payment-return-success.png`
+13. **確認訂單狀態**：頁面顯示「已付款」與「付款成功！感謝您的購買。」，用 `browser_take_screenshot` 截圖（不傳 `filename`），記下回傳的檔名，對應「返回商店已付款」
     - 若仍為「待付款」（綠界狀態可能延遲），等幾秒後點「查詢付款狀態」按鈕，最多重試 3 次
 
 **預期結果**：訂單狀態為「已付款」。
@@ -76,7 +76,11 @@ description: 用 Playwright MCP 對花漾生活花卉電商（http://localhost:3
 
 ## 截圖存放位置
 
-`e2e-tester` 的 Playwright MCP 以 `--output-dir test-results/e2e-mcp` 啟動，截圖存到專案的 `test-results/e2e-mcp/`（已列入 `.gitignore`）。未指定時會存到 MCP 的暫存目錄，agent 結束後找不到。
+`e2e-tester` 的 Playwright MCP 以 `--output-dir test-results/e2e-mcp` 啟動（已列入 `.gitignore`）。
+
+- **`browser_take_screenshot` 不要傳 `filename`**：不傳時檔案存到 output 目錄 `test-results/e2e-mcp/page-<時間>.png`，回報時說明每個檔名對應哪個畫面
+- 傳了 `filename` 時，路徑會以 Claude Code 的 workspace 根目錄解析；但根目錄是 WSL 路徑 `/mnt/d/...`，Windows 版 node 會把它當成 `D:\mnt\d\...`，截圖就會寫到 `D:\mnt\d\00.hexschool\...` 這個錯誤的位置
+- 沒有設定 `--output-dir` 時，會存到 MCP 的暫存目錄，agent 結束後找不到
 
 ## 環境注意事項（WSL + Windows node）
 
