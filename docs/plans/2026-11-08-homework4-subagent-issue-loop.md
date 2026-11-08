@@ -268,20 +268,20 @@ Loop 回報｜Issue #<編號>｜第 <N> 輪
 ### 挑戰二
 
 - [x] 用 `gh label create` 建立 `ready`、`in-progress`、`in-review`、`needs-human`
-- [ ] 在 GitHub 網頁建立 Issue A 並加上 `ready`
-- [ ] `.claude/settings.json` 的 `permissions.deny` 加入 `"Edit(./tests/acceptance/**)"`，commit 並推上 `main`
-- [ ] Issue A：標籤改為 `in-progress`
-- [ ] Issue A：開分支 `issue-<編號>-checkout-coupon`
-- [ ] Issue A：新增 `src/utils/coupon.js` 與單元測試 `tests/coupon.test.js`
-- [ ] Issue A：`orders` 表 migration 新增 `coupon_code`、`discount`
-- [ ] Issue A：`POST /api/orders` 套用優惠碼，運費以折扣後小計計算
-- [ ] Issue A：`GET /api/orders/:id` 回傳兩欄，確認 ECPay 金額使用新總額
-- [ ] Issue A：補 integration test（無效優惠碼時訂單、庫存、購物車不變）
-- [ ] Issue A：派 `test-runner` 跑 unit、integration、`test:acceptance -- coupon`
-- [ ] Issue A：更新 JSDoc、`openapi.json`、`docs/FEATURES.md`、`docs/ARCHITECTURE.md`（schema）、`docs/CHANGELOG.md`
-- [ ] Issue A：開 PR（`Closes #<編號>`），派 reviewer 檢查，修正「高」嚴重度問題
-- [ ] Issue A：標籤改為 `in-review`，等待 CI 通過後由本人合併
-- [ ] 建立 `.claude/skills/work-issue/SKILL.md`（`/work-issue <編號>`，含步驟與邊界，不含合併 PR）
+- [x] 在 GitHub 網頁建立 Issue A 並加上 `ready`
+- [x] `.claude/settings.json` 的 `permissions.deny` 加入 `"Edit(./tests/acceptance/**)"`，commit 並推上 `main`
+- [x] Issue A：標籤改為 `in-progress`
+- [x] Issue A：開分支 `issue-<編號>-checkout-coupon`
+- [x] Issue A：新增 `src/utils/coupon.js` 與單元測試 `tests/coupon.test.js`
+- [x] Issue A：`orders` 表 migration 新增 `coupon_code`、`discount`
+- [x] Issue A：`POST /api/orders` 套用優惠碼，運費以折扣後小計計算
+- [x] Issue A：`GET /api/orders/:id` 回傳兩欄，確認 ECPay 金額使用新總額
+- [x] Issue A：補 integration test（無效優惠碼時訂單、庫存、購物車不變）
+- [x] Issue A：派 `test-runner` 跑 unit、integration、`test:acceptance -- coupon`
+- [x] Issue A：更新 JSDoc、`openapi.json`、`docs/FEATURES.md`、`docs/ARCHITECTURE.md`（schema）、`docs/CHANGELOG.md`
+- [x] Issue A：開 PR（`Closes #<編號>`），派 reviewer 檢查，修正「高」嚴重度問題
+- [x] Issue A：標籤改為 `in-review`，等待 CI 通過後由本人合併
+- [x] 建立 `.claude/skills/work-issue/SKILL.md`（`/work-issue <編號>`，含步驟與邊界，不含合併 PR）
 - [ ] commit 並推上 `main`
 
 ### 挑戰三
