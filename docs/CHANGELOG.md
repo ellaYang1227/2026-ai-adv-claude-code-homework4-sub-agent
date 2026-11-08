@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+### Added
+- 結帳優惠碼（Issue #1）：新增 `src/utils/coupon.js`，支援 `FLOWER100`（滿 800 折 100）、`SPRING10`（9 折、最多折 300）；`SUMMER50` 已失效。`POST /api/orders` 新增選填 `couponCode`，回應與 `GET /api/orders/:id` 新增 `discount`、`coupon_code`
+- `orders` 表新增 `coupon_code`、`discount` 欄位（可重複執行的 migration，舊訂單 `discount = 0`）
+- 優惠碼無效、失效或未達門檻時回 400（`INVALID_COUPON`、`COUPON_EXPIRED`、`COUPON_NOT_APPLICABLE`），不建立訂單、不扣庫存、不清空購物車
+- 新增 `tests/coupon.test.js` 與 2 項優惠碼 Integration Test（DB 快照、綠界 `TotalAmount`、無效優惠碼不動資料）
+
+### Changed
+- 免運門檻改以折扣後的商品小計判斷；訂單總額 = 商品小計 − 折扣 + 運費
+
+### Fixed
+- AI Code Review 修正（詳見 `docs/ai-review.md`）：免運門檻改為 `>=`、恢復被跳過的 1,500 元邊界測試、`GET /api/orders/:id` 限定本人訂單、`PATCH /api/cart/:itemId` 驗證正整數、綠界查詢結果一律驗證 CheckMacValue
+
 ### Changed
 - 抽出 `src/services/orderService.js`（訂單查詢、序列化與建單 transaction）與 `src/services/paymentService.js`（QueryTradeInfo 結果判斷與付款狀態更新）
 - 新增 `src/utils/validators.js` 統一路由輸入驗證；Shipping 模組改以規則表描述，單元測試改為 table-driven

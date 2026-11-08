@@ -245,6 +245,11 @@
                   },
                   "isExpress": {
                     "type": "boolean"
+                  },
+                  "couponCode": {
+                    "type": "string",
+                    "description": "選填優惠碼，不分大小寫（FLOWER100、SPRING10）",
+                    "example": "FLOWER100"
                   }
                 }
               }
@@ -269,10 +274,21 @@
                           "type": "string"
                         },
                         "subtotal": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "商品小計（折扣前）"
+                        },
+                        "discount": {
+                          "type": "integer",
+                          "description": "優惠碼折扣金額；未使用為 0"
+                        },
+                        "coupon_code": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "使用的優惠碼（大寫）；未使用為 null"
                         },
                         "shipping_fee": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "運費；免運門檻以折扣後的商品小計判斷"
                         },
                         "shipping_method": {
                           "type": "string",
@@ -288,7 +304,8 @@
                           "type": "boolean"
                         },
                         "total_amount": {
-                          "type": "integer"
+                          "type": "integer",
+                          "description": "商品小計 - 折扣 + 運費"
                         },
                         "status": {
                           "type": "string"
@@ -328,7 +345,7 @@
             }
           },
           "400": {
-            "description": "購物車為空或庫存不足或收件資訊缺失"
+            "description": "購物車為空、庫存不足、收件資訊缺失，或優惠碼無法使用。\n優惠碼錯誤碼：INVALID_COUPON（不存在或格式錯誤）、COUPON_EXPIRED（已失效）、COUPON_NOT_APPLICABLE（未達使用門檻）。\n優惠碼錯誤時不建立訂單、不扣庫存、不清空購物車。\n"
           }
         }
       },
@@ -451,6 +468,15 @@
                         },
                         "subtotal": {
                           "type": "integer"
+                        },
+                        "discount": {
+                          "type": "integer",
+                          "description": "優惠碼折扣金額；未使用為 0"
+                        },
+                        "coupon_code": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "使用的優惠碼（大寫）；未使用為 null"
                         },
                         "shipping_fee": {
                           "type": "integer"
