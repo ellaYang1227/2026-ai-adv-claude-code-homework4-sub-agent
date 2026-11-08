@@ -13,10 +13,10 @@
 ## 執行指令
 
 ```bash
-# 單元與 API 測試（7 個檔案、55 項測試）
+# 單元與 API 測試（8 個檔案、91 項測試）
 npm run test:unit
 
-# 結帳、訂單、DB、庫存、回滾與綠界整合測試（10 項測試）
+# 結帳、訂單、優惠碼、DB、庫存、回滾與綠界整合測試（12 項測試）
 npm run test:integration
 
 # 已另行啟動 http://localhost:3001 後，執行真實付款 E2E
@@ -135,7 +135,8 @@ Integration Test 中有兩層防護：
 
 | 檔案 | 範圍 |
 |------|------|
-| `tests/shipping.test.js` | Shipping 純函式、門檻與附加費 |
+| `tests/shipping.test.js` | Shipping 純函式、門檻（含剛好 1,500 元）與附加費 |
+| `tests/coupon.test.js` | Coupon 純函式：三組優惠碼、門檻、四捨五入與上限、大小寫、無效／失效／非字串代碼 |
 | `tests/auth.test.js` | 註冊、登入、重複 Email、個人資料、非字串欄位、JSON 格式錯誤 |
 | `tests/products.test.js` | 商品列表、分頁、詳情與 404 |
 | `tests/cart.test.js` | 訪客/會員購物車 CRUD、數量驗證、登入/註冊時合併訪客購物車（含庫存上限） |

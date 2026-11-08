@@ -313,6 +313,71 @@ describe('Order checkout integration flow', () => {
     ).get(member.user.id).count).toBe(2);
   });
 
+  it('persists the coupon snapshot and charges ECPay the discounted total', async () => {
+    const member = await registerMember('coupon-member@example.com');
+    await addProductToCart(member.token, primaryProduct.id, 2);
+
+    const response = await request(app)
+      .post('/api/orders')
+      .set('Authorization', `Bearer ${member.token}`)
+      .send({ ...ORDER_PAYLOAD, couponCode: 'spring10' });
+
+    // subtotal 1400, SPRING10 discount 140 → 1260; convenience store 60 + remote 200 + express 250
+    expectEnvelope(response, 201);
+    expect(response.body.error).toBeNull();
+    expect(response.body.data).toMatchObject({
+      subtotal: 1400,
+      discount: 140,
+      coupon_code: 'SPRING10',
+      shipping_fee: 510,
+      total_amount: 1770
+    });
+
+    const persisted = db.prepare(
+      'SELECT subtotal, discount, coupon_code, shipping_fee, total_amount FROM orders WHERE id = ?'
+    ).get(response.body.data.id);
+    expect(persisted).toEqual({
+      subtotal: 1400,
+      discount: 140,
+      coupon_code: 'SPRING10',
+      shipping_fee: 510,
+      total_amount: 1770
+    });
+
+    const form = await request(app).get(`/ecpay/payment/${response.body.data.id}`);
+    expect(form.status).toBe(200);
+    const params = parseHiddenInputs(form.text);
+    expect(params.TotalAmount).toBe('1770');
+    expect(verifyCheckMacValue(params, ECPAY_CONFIG.hashKey, ECPAY_CONFIG.hashIV)).toBe(true);
+  });
+
+  it('rejects an invalid coupon without creating an order, deducting stock or clearing the cart', async () => {
+    const member = await registerMember('coupon-invalid@example.com');
+    await addProductToCart(member.token, primaryProduct.id, 2);
+
+    for (const [couponCode, error] of [
+      ['NOT-A-COUPON', 'INVALID_COUPON'],
+      ['SUMMER50', 'COUPON_EXPIRED'],
+      [{ code: 'FLOWER100' }, 'INVALID_COUPON']
+    ]) {
+      const response = await request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${member.token}`)
+        .send({ ...ORDER_PAYLOAD, couponCode });
+
+      expectEnvelope(response, 400);
+      expect(response.body.data).toBeNull();
+      expect(response.body.error).toBe(error);
+    }
+
+    expect(db.prepare('SELECT COUNT(*) AS count FROM orders').get().count).toBe(0);
+    expect(db.prepare('SELECT COUNT(*) AS count FROM order_items').get().count).toBe(0);
+    expect(db.prepare('SELECT stock FROM products WHERE id = ?').get(primaryProduct.id).stock).toBe(10);
+    expect(db.prepare(
+      'SELECT quantity FROM cart_items WHERE user_id = ? AND product_id = ?'
+    ).get(member.user.id, primaryProduct.id).quantity).toBe(2);
+  });
+
   it('builds a valid ECPay staging form with the persisted order total', async () => {
     const { order } = await createPendingOrder(primaryProduct, 'ecpay-form@example.com');
     const response = await request(app).get(`/ecpay/payment/${order.id}`);

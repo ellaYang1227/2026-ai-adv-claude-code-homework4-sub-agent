@@ -3,6 +3,7 @@ const db = require('../database');
 const authMiddleware = require('../middleware/authMiddleware');
 const { queryTradeInfo } = require('../utils/ecpay');
 const { SHIPPING_METHODS, calculateShipping } = require('../utils/shipping');
+const { applyCoupon, CouponError } = require('../utils/coupon');
 const {
   serializeOrder,
   findOrderById,
@@ -59,6 +60,10 @@ function testEnvOnly(req, res, next) {
  *                 type: boolean
  *               isExpress:
  *                 type: boolean
+ *               couponCode:
+ *                 type: string
+ *                 description: 選填優惠碼，不分大小寫（FLOWER100、SPRING10）
+ *                 example: FLOWER100
  *     responses:
  *       201:
  *         description: 訂單建立成功
@@ -76,8 +81,17 @@ function testEnvOnly(req, res, next) {
  *                       type: string
  *                     subtotal:
  *                       type: integer
+ *                       description: 商品小計（折扣前）
+ *                     discount:
+ *                       type: integer
+ *                       description: 優惠碼折扣金額；未使用為 0
+ *                     coupon_code:
+ *                       type: string
+ *                       nullable: true
+ *                       description: 使用的優惠碼（大寫）；未使用為 null
  *                     shipping_fee:
  *                       type: integer
+ *                       description: 運費；免運門檻以折扣後的商品小計判斷
  *                     shipping_method:
  *                       type: string
  *                       enum: [home_delivery, convenience_store]
@@ -87,6 +101,7 @@ function testEnvOnly(req, res, next) {
  *                       type: boolean
  *                     total_amount:
  *                       type: integer
+ *                       description: 商品小計 - 折扣 + 運費
  *                     status:
  *                       type: string
  *                     items:
@@ -108,7 +123,10 @@ function testEnvOnly(req, res, next) {
  *                 message:
  *                   type: string
  *       400:
- *         description: 購物車為空或庫存不足或收件資訊缺失
+ *         description: |
+ *           購物車為空、庫存不足、收件資訊缺失，或優惠碼無法使用。
+ *           優惠碼錯誤碼：INVALID_COUPON（不存在或格式錯誤）、COUPON_EXPIRED（已失效）、COUPON_NOT_APPLICABLE（未達使用門檻）。
+ *           優惠碼錯誤時不建立訂單、不扣庫存、不清空購物車。
  */
 router.post('/', (req, res) => {
   const {
@@ -117,7 +135,8 @@ router.post('/', (req, res) => {
     recipientAddress,
     shippingMethod,
     isRemoteArea,
-    isExpress
+    isExpress,
+    couponCode
   } = req.body;
   const userId = req.user.userId;
 
@@ -174,16 +193,31 @@ router.post('/', (req, res) => {
     });
   }
 
-  // Calculate the subtotal and server-authoritative shipping fee.
+  // Calculate the subtotal, coupon discount and server-authoritative shipping fee.
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.product_price * item.quantity, 0
   );
+
+  // Validate the coupon before the transaction so a rejected code never
+  // creates an order, deducts stock or clears the cart.
+  let coupon;
+  try {
+    coupon = applyCoupon({ code: couponCode, subtotal });
+  } catch (err) {
+    if (err instanceof CouponError) {
+      return res.status(400).json({ data: null, error: err.code, message: err.message });
+    }
+    throw err;
+  }
+
+  // The free-shipping threshold is judged on the discounted item subtotal.
   const shipping = calculateShipping({
-    subtotal,
+    subtotal: coupon.discountedSubtotal,
     method: shippingMethod,
     isRemoteArea,
     isExpress
   });
+  const totalAmount = subtotal - coupon.discount + shipping.shippingFee;
 
   const orderId = createOrderFromCart({
     userId,
@@ -191,7 +225,9 @@ router.post('/', (req, res) => {
     delivery: { method: shippingMethod, isRemoteArea, isExpress },
     cartItems,
     subtotal,
-    shipping
+    coupon,
+    shipping,
+    totalAmount
   });
 
   const order = findOrderById(orderId);
@@ -202,6 +238,8 @@ router.post('/', (req, res) => {
       id: order.id,
       order_no: order.order_no,
       subtotal: order.subtotal,
+      discount: order.discount,
+      coupon_code: order.coupon_code,
       shipping_fee: order.shipping_fee,
       shipping_method: order.shipping_method,
       is_remote_area: Boolean(order.is_remote_area),
@@ -309,6 +347,13 @@ router.get('/', (req, res) => {
  *                       type: string
  *                     subtotal:
  *                       type: integer
+ *                     discount:
+ *                       type: integer
+ *                       description: 優惠碼折扣金額；未使用為 0
+ *                     coupon_code:
+ *                       type: string
+ *                       nullable: true
+ *                       description: 使用的優惠碼（大寫）；未使用為 null
  *                     shipping_fee:
  *                       type: integer
  *                     shipping_method:
